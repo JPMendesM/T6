@@ -1,129 +1,112 @@
-import java.util.*;
-
 public class TreeIsomorphism {
-    private Graph G;
-    private boolean isTree;
-    private String reasonNotTree;
-    private List<Integer> centers;
-    private String canonicalCode;
+    private final Graph graph;
 
-    public TreeIsomorphism(Graph G) {
-        this.G = G;
-        this.centers = new ArrayList<>();
-
-        validateTree();
-        if (isTree) {
-            findCenters();
-            computeCanonicalCode();
+    public TreeIsomorphism(Graph graph) {
+        if (graph == null) {
+            throw new IllegalArgumentException("graph nao pode ser nulo");
         }
+        this.graph = graph;
     }
 
-    // 1. Valida se o grafo é realmente uma árvore conectada e sem ciclos
-    private void validateTree() {
-        int V = G.V();
-        if (V == 0) {
-            isTree = false;
-            reasonNotTree = "O grafo esta vazio (0 vertices).";
-            return;
-        }
+    public Graph getGraph() {
+        return graph;
+    }
 
-        // Uma árvore deve ter exatamente V - 1 arestas
-        if (G.E() != V - 1) {
-            isTree = false;
-            reasonNotTree = "Arestas (" + G.E() + ") diferentes de V-1 (" + (V - 1) + "). Contem ciclos ou e desconexo.";
-            return;
-        }
+    /**
+     * Valida se o grafo é uma árvore:
+     * 1. Conexão: Deve ser possível visitar todos os V vértices partindo do 0.
+     * 2. Arestas: Deve possuir exatamente V-1 arestas.
+     */
+    public boolean isTree() {
+        int V = graph.V();
+        if (V == 0) return false;
+        if (graph.E() != V - 1) return false;
 
-        // Verifica se todos os vértices estão conectados
-        boolean[] visited = new boolean[V];
-        dfs(0, visited);
+        boolean[] marked = new boolean[V];
+        int count = countVisited(0, marked);
 
-        for (int i = 0; i < V; i++) {
-            if (!visited[i]) {
-                isTree = false;
-                reasonNotTree = "O grafo e desconexo. O vertice " + i + " nao foi alcancado.";
-                return;
+        return count == V;
+    }
+
+    private int countVisited(int s, boolean[] marked) {
+        int count = 1;
+        marked[s] = true;
+        for (int v : graph.adj(s)) {
+            if (!marked[v]) {
+                count += countVisited(v, marked);
             }
         }
-
-        isTree = true;
-        reasonNotTree = "Valido";
+        return count;
     }
 
-    private void dfs(int v, boolean[] visited) {
-        visited[v] = true;
-        for (int w : G.adj(v)) {
-            if (!visited[w]) dfs(w, visited);
-        }
+    public String getValidationMessage() {
+        return isTree() ? "A entrada e uma arvore valida." : "A entrada NAO e uma arvore (ciclos ou desconexa).";
     }
 
-    // 2. Encontra os centros removendo as folhas iterativamente
-    private void findCenters() {
-        int V = G.V();
-        if (V == 1) {
-            centers.add(0);
-            return;
-        }
+    /**
+     * Encontra o(s) centro(s) da árvore removendo folhas sucessivamente.
+     */
+    public int[] getCenters() {
+        int V = graph.V();
+        if (V == 1) return new int[]{0};
 
         int[] degree = new int[V];
-        List<Integer> leaves = new ArrayList<>();
+        java.util.List<Integer> leaves = new java.util.ArrayList<Integer>();
 
-        for (int i = 0; i < V; i++) {
-            int d = 0;
-            for (int w : G.adj(i)) d++;
-            degree[i] = d;
-
-            if (degree[i] == 0 || degree[i] == 1) {
-                leaves.add(i);
-            }
+        for (int v = 0; v < V; v++) {
+            degree[v] = graph.degree(v);
+            if (degree[v] <= 1) leaves.add(v);
         }
 
         int processed = leaves.size();
         while (processed < V) {
-            List<Integer> newLeaves = new ArrayList<>();
+            java.util.List<Integer> newLeaves = new java.util.ArrayList<Integer>();
             for (int u : leaves) {
-                for (int v : G.adj(u)) {
+                for (int v : graph.adj(u)) {
                     degree[v]--;
-                    if (degree[v] == 1) {
-                        newLeaves.add(v);
-                    }
+                    if (degree[v] == 1) newLeaves.add(v);
                 }
             }
             processed += newLeaves.size();
             leaves = newLeaves;
         }
-        centers = leaves;
+
+        int[] centers = new int[leaves.size()];
+        for (int i = 0; i < leaves.size(); i++) centers[i] = leaves.get(i);
+        return centers;
     }
 
-    // 3. Computa o código canônico
-    private void computeCanonicalCode() {
-        if (centers.size() == 1) {
-            canonicalCode = encode(centers.get(0), -1);
-        } else if (centers.size() == 2) {
-            // Em caso de bi-centro, calculamos a partir de ambos e pegamos o lexicograficamente menor.
-            // Isso garante uma única representação textual absoluta para a árvore.
-            String code1 = encode(centers.get(0), -1);
-            String code2 = encode(centers.get(1), -1);
-            canonicalCode = code1.compareTo(code2) < 0 ? code1 : code2;
+    /**
+     * Gera a codificação canônica baseada nos centros.
+     */
+    public String getCanonicalEncoding() {
+        if (!isTree()) return null;
+
+        int[] centers = getCenters();
+        java.util.List<String> codes = new java.util.ArrayList<String>();
+
+        for (int center : centers) {
+            codes.add(encode(center, -1));
         }
+
+        java.util.Collections.sort(codes);
+        return codes.get(0);
     }
 
-    // 4. Codificação Recursiva (DFS enraizada)
-    private String encode(int u, int parent) {
-        List<String> childCodes = new ArrayList<>();
+    /**
+     * Codifica a subárvore recursivamente.
+     */
+    private String encode(int u, int p) {
+        java.util.List<String> childCodes = new java.util.ArrayList<String>();
 
-        for (int v : G.adj(u)) {
-            if (v != parent) {
+        for (int v : graph.adj(u)) {
+            if (v != p) {
                 childCodes.add(encode(v, u));
             }
         }
 
-        if (childCodes.isEmpty()) {
-            return "()"; // É folha
-        }
-
-        // Ordena para garantir que a ordem de leitura das arestas não influencie
-        Collections.sort(childCodes);
+        // Ordenação essencial para garantir que a estrutura seja independente dos rótulos
+        java.util.Collections.sort(childCodes);
 
         StringBuilder sb = new StringBuilder("(");
         for (String code : childCodes) {
@@ -133,9 +116,4 @@ public class TreeIsomorphism {
 
         return sb.toString();
     }
-
-    public boolean isTree() { return isTree; }
-    public String getReasonNotTree() { return reasonNotTree; }
-    public List<Integer> getCenters() { return centers; }
-    public String getCanonicalCode() { return canonicalCode; }
 }
