@@ -105,7 +105,6 @@ public class TreeIsomorphism {
             }
         }
 
-        // Ordenação essencial para garantir que a estrutura seja independente dos rótulos
         java.util.Collections.sort(childCodes);
 
         StringBuilder sb = new StringBuilder("(");
