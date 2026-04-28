@@ -16,46 +16,23 @@ public class Main {
         Graph tree1 = new Graph(new In(path1));
         Graph tree2 = new Graph(new In(path2));
 
-        StdOut.println("--- Arvore 1 (Lista de Adjacencia) ---");
+        StdOut.println("Arvore 1:");
         StdOut.println(tree1);
+        StdOut.println();
 
-        StdOut.println("--- Arvore 2 (Lista de Adjacencia) ---");
+        StdOut.println("Arvore 2:");
         StdOut.println(tree2);
+        StdOut.println();
 
         TreeIsomorphism analysis1 = new TreeIsomorphism(tree1);
         TreeIsomorphism analysis2 = new TreeIsomorphism(tree2);
 
-        StdOut.println("Validacao Arvore 1: " + analysis1.getValidationMessage());
-        StdOut.println("Validacao Arvore 2: " + analysis2.getValidationMessage());
+        StdOut.println("TODO: complete a validacao das entradas, o calculo dos centros,");
+        StdOut.println("a codificacao canonica e o veredito final de isomorfismo.");
 
-        if (!analysis1.isTree() || !analysis2.isTree()) {
-            StdOut.println("\nErro: Uma das entradas nao e uma arvore valida.");
-            return;
-        }
-
-        int[] c1 = analysis1.getCenters();
-        int[] c2 = analysis2.getCenters();
-
-        StdOut.print("Centros Arvore 1: ");
-        for(int v : c1) StdOut.print(v + " ");
-        StdOut.println();
-
-        StdOut.print("Centros Arvore 2: ");
-        for(int v : c2) StdOut.print(v + " ");
-        StdOut.println("\n");
-
-        String code1 = analysis1.getCanonicalEncoding();
-        String code2 = analysis2.getCanonicalEncoding();
-
-        StdOut.println("Codificacao 1: " + code1);
-        StdOut.println("Codificacao 2: " + code2);
-
-        StdOut.println("-------------------------------------------");
-        if (code1 != null && code1.equals(code2)) {
-            StdOut.println("RESULTADO: As arvores sao ISOMORFAS.");
-        } else {
-            StdOut.println("RESULTADO: As arvores NAO sao isomorfas.");
-        }
-        StdOut.println("-------------------------------------------");
+        StdOut.println(analysis1.getValidationMessage());
+        StdOut.println(analysis2.getValidationMessage());
+        StdOut.println(analysis1.getCanonicalEncoding());
+        StdOut.println(analysis2.getCanonicalEncoding());
     }
 }
