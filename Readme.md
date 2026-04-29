@@ -4,7 +4,7 @@ Este projeto é o **Trabalho Prático 6** da disciplina de **Resolução de Prob
 
 ## 🎥 Vídeo Explicativo
 
-**Link para o vídeo no YouTube:** [INSIRA O SEU LINK AQUI]  
+**Link para o vídeo no YouTube:** (https://drive.google.com/drive/folders/1aIaF1_HhkJufc3IZSgojyfp1QjLiX8NX?usp=sharing)
 *(Nota: O vídeo contém a explicação do isomorfismo, a lógica de encontrar os centros, o funcionamento da codificação canônica com ordenação lexicográfica e a validação estrutural).*
 
 ---
